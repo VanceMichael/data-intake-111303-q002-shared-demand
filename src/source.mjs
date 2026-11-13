@@ -44,7 +44,8 @@ export async function startSource(scenario, options = {}) {
       if (outlet && request.headers['x-tenant'] !== outlet[1]) {
         response.writeHead(403).end('出口租户不匹配'); return;
       }
-      const entry = scenario.routes.find(candidate => candidate.path === logical && (candidate.method ?? 'GET') === request.method);
+      const entry = scenario.routes.find(candidate => candidate.path === logical && (candidate.method ?? 'GET') === request.method)
+        ?? scenario.routes.find(candidate => candidate.path === address.pathname && (candidate.method ?? 'GET') === request.method);
       if (!entry) { response.writeHead(404).end('本地来源无此资源'); return; }
       const count = counters.get(logical) ?? 0;
       counters.set(logical, count + 1);
