@@ -1,0 +1,169 @@
+[
+  {
+    "name": "相同需求共享但取消独立",
+    "routes": [
+      {
+        "path": "/data",
+        "body": {
+          "version": "v1",
+          "capturedAt": 100,
+          "range": [
+            0,
+            100
+          ],
+          "ids": [
+            "a",
+            "b"
+          ]
+        },
+        "delay": 70
+      }
+    ],
+    "input": {
+      "now": 100,
+      "operations": [
+        {
+          "at": 0,
+          "action": "submit",
+          "id": "daily",
+          "range": [
+            0,
+            100
+          ],
+          "maxAge": 10,
+          "deadline": 300
+        },
+        {
+          "at": 10,
+          "action": "submit",
+          "id": "desk",
+          "range": [
+            0,
+            100
+          ],
+          "maxAge": 10,
+          "deadline": 300
+        },
+        {
+          "at": 20,
+          "action": "cancel",
+          "id": "desk"
+        }
+      ]
+    },
+    "expected": {
+      "subscribers": {
+        "daily": "complete",
+        "desk": "cancelled"
+      }
+    },
+    "required": [
+      "/data"
+    ],
+    "limits": {
+      "/data": 1
+    }
+  },
+  {
+    "name": "短需求过期不终止长期订阅",
+    "routes": [
+      {
+        "path": "/data",
+        "body": {
+          "version": "v1",
+          "capturedAt": 100,
+          "range": [
+            0,
+            100
+          ],
+          "ids": [
+            "a"
+          ]
+        },
+        "delay": 80
+      }
+    ],
+    "input": {
+      "now": 100,
+      "operations": [
+        {
+          "at": 0,
+          "action": "submit",
+          "id": "short",
+          "range": [
+            0,
+            100
+          ],
+          "maxAge": 10,
+          "deadline": 20
+        },
+        {
+          "at": 5,
+          "action": "submit",
+          "id": "long",
+          "range": [
+            0,
+            100
+          ],
+          "maxAge": 10,
+          "deadline": 300
+        }
+      ]
+    },
+    "expected": {
+      "subscribers": {
+        "short": "expired",
+        "long": "complete"
+      }
+    },
+    "required": [
+      "/data"
+    ]
+  },
+  {
+    "name": "过期资料不能完成新需求",
+    "routes": [
+      {
+        "path": "/data",
+        "body": {
+          "version": "v0",
+          "capturedAt": 50,
+          "range": [
+            0,
+            100
+          ],
+          "ids": [
+            "old"
+          ]
+        }
+      }
+    ],
+    "input": {
+      "now": 100,
+      "operations": [
+        {
+          "at": 0,
+          "action": "submit",
+          "id": "fresh",
+          "range": [
+            0,
+            100
+          ],
+          "maxAge": 5,
+          "deadline": 40
+        }
+      ]
+    },
+    "expected": {
+      "subscribers": {
+        "fresh": "expired"
+      }
+    },
+    "required": [
+      "/data"
+    ],
+    "limits": {
+      "/data": 5
+    }
+  }
+]
