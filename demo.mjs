@@ -6,7 +6,7 @@ import { startSource } from './src/source.mjs';
 const { run } = await import('./src/workflow.mjs');
 setTimeout(() => { console.error('运行超过 75 秒，停止并保留失败状态'); process.exit(124); }, 75000).unref();
 const scenarios = JSON.parse(await readFile(new URL('./fixtures/cases.json', import.meta.url)));
-for (const scenario of scenarios.slice(0, 3)) {
+for (const scenario of scenarios) {
   const source = await startSource(scenario);
   const stateDir = await mkdtemp(path.join(tmpdir(), 'material-demo-'));
   try {

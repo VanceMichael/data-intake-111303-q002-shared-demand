@@ -165,5 +165,167 @@
     "limits": {
       "/data": 5
     }
+  },
+  {
+    "name": "宽范围需求复用在途抓取并补抓差集",
+    "routes": [
+      {
+        "path": "/data?from=0&until=100",
+        "body": {
+          "version": "v1",
+          "capturedAt": 100,
+          "range": [
+            0,
+            100
+          ],
+          "ids": [
+            "a",
+            "b"
+          ]
+        },
+        "delay": 60
+      },
+      {
+        "path": "/data?from=100&until=200",
+        "body": {
+          "version": "v1",
+          "capturedAt": 100,
+          "range": [
+            100,
+            200
+          ],
+          "ids": [
+            "c"
+          ]
+        },
+        "delay": 20
+      }
+    ],
+    "input": {
+      "now": 100,
+      "operations": [
+        {
+          "at": 0,
+          "action": "submit",
+          "id": "base",
+          "range": [
+            0,
+            100
+          ],
+          "maxAge": 10,
+          "deadline": 300
+        },
+        {
+          "at": 10,
+          "action": "submit",
+          "id": "wide",
+          "range": [
+            0,
+            200
+          ],
+          "maxAge": 10,
+          "deadline": 300
+        }
+      ]
+    },
+    "expected": {
+      "subscribers": {
+        "base": "complete",
+        "wide": "complete"
+      }
+    },
+    "required": [
+      "/data"
+    ],
+    "limits": {
+      "/data": 2
+    }
+  },
+  {
+    "name": "相同查询各自判断资料新鲜度",
+    "routes": [
+      {
+        "path": "/data",
+        "body": {
+          "version": "v1",
+          "capturedAt": 90,
+          "range": [
+            0,
+            100
+          ],
+          "ids": [
+            "a"
+          ]
+        },
+        "replies": [
+          {
+            "body": {
+              "version": "v1",
+              "capturedAt": 90,
+              "range": [
+                0,
+                100
+              ],
+              "ids": [
+                "a"
+              ]
+            }
+          },
+          {
+            "body": {
+              "version": "v2",
+              "capturedAt": 100,
+              "range": [
+                0,
+                100
+              ],
+              "ids": [
+                "a",
+                "b"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "input": {
+      "now": 100,
+      "operations": [
+        {
+          "at": 0,
+          "action": "submit",
+          "id": "loose",
+          "range": [
+            0,
+            100
+          ],
+          "maxAge": 10,
+          "deadline": 200
+        },
+        {
+          "at": 30,
+          "action": "submit",
+          "id": "strict",
+          "range": [
+            0,
+            100
+          ],
+          "maxAge": 5,
+          "deadline": 300
+        }
+      ]
+    },
+    "expected": {
+      "subscribers": {
+        "loose": "complete",
+        "strict": "complete"
+      }
+    },
+    "required": [
+      "/data"
+    ],
+    "limits": {
+      "/data": 2
+    }
   }
 ]
